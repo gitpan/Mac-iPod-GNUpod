@@ -11,7 +11,6 @@ package Mac::iPod::GNUpod::iTunesDBwrite;
 use strict;
 use warnings;
 no warnings 'uninitialized';
-use Carp qw/carp croak/;
 use Unicode::String;
 use Mac::iPod::GNUpod::Utils;
 
@@ -70,11 +69,11 @@ sub render_mhit {
     my ($cumul_mhod, $count_mhod);
 
     # Copy the hashref and give it the new id
-    my %copy = %$file;
-    $copy{id} = $newid;
+    #my %copy = %$file;
+    #$copy{id} = $newid;
 
     # Make mhods
-    while (my ($key, $val) = each %copy) {
+    while (my ($key, $val) = each %$file) {
         next unless $val; # No empty fields
         my $new_mhod = mk_mhod( { stype => $key, string => $val } );
         $cumul_mhod .= $new_mhod;
@@ -85,7 +84,7 @@ sub render_mhit {
     my $mhit = mk_mhit({
         size => length($cumul_mhod),
         count => $count_mhod,
-        fh => \%copy
+        fh => $file
     });
 
     return $mhit . $cumul_mhod;
@@ -105,13 +104,13 @@ sub mk_mhit {
         $vol = oct("0xFFFFFFFF") + $vol; 
     }
     else {
-        carp "Song id $file_hash{id} has volume set to $file_hash{volume} percent. Volume set to +-0%\n";
+        $@ .= "Song id $file_hash{id} has volume set to $file_hash{volume} percent. Volume set to +-0%\n";
         $vol = 0; #We won't nuke the iPod with an ultra high volume setting..
     }
 
     foreach( ("rating", "prerating") ) {
         if($file_hash{$_} < 0 || $file_hash{$_} > 5) {
-            carp "Song $file_hash{id} has an invalid $_: $file_hash{$_}";
+            $@ .= "Song $file_hash{id} has an invalid $_: $file_hash{$_}\n";
             $file_hash{$_} = 0;
         }
     }
@@ -119,7 +118,7 @@ sub mk_mhit {
     #Check for stupid input
     my ($c_id) = $file_hash{id} =~ /(\d+)/;
     if($c_id < 1) {
-        carp "ID can't be $c_id, must be > 0";
+        $@ .= "ID can't be $c_id, must be > 0\n";
     }
 
     my $ret = "mhit";
@@ -197,7 +196,7 @@ sub mk_mhod {
     }
 
     if($type == 7 && $string !~ /#!#\d+#!#/) {
-        carp "Wrong format: '$type_string=\"$string\"', value should be like '#!#NUMBER#!#'. ignoring value";
+        $@ .= "Wrong format: '$type_string=\"$string\"', value should be like '#!#NUMBER#!#'. ignoring value\n";
         $string = undef;
     }
 
@@ -233,7 +232,7 @@ sub mk_splprefmhod {
     $mos = 1 if $hs->{mos};
 
     if($checkrule < 1 || $checkrule > 3) {
-        carp "'checkrule' ($checkrule) out of range. Value set to 1 (=LimitMatch)";
+        $@ .= "'checkrule' ($checkrule) out of range. Value set to 1 (=LimitMatch)\n";
         $checkrule = 1;
     }
 
@@ -264,7 +263,7 @@ sub mk_spldatamhod {
     my $anymatch = 1 if $hs->{anymatch};
 
     if(ref($hs->{data}) ne "ARRAY") {
-        carp "No spldata found in spl, iTunes4-workaround enabled";
+        $@ .= "No spldata found in spl, iTunes4-workaround enabled";
         push(@{$hs->{data}}, {field=>4,action=>2,string=>""});
     }
 
@@ -291,7 +290,7 @@ sub mk_spldatamhod {
         }
 
         if(length($string) > 254) { #length field is limited to 0xfe!
-            carp "Splstring too long for iTunes, cropping\n";
+            $@ .= "Splstring too long for iTunes, cropping\n";
             $string = substr($string,0,254);
         }
 
@@ -438,11 +437,17 @@ sub mk_mhip {
 
 #Convert utf8 (what we got from XML::Parser) to utf16 (ipod)
 sub _ipod_string {
-    my ($utf8string) = @_;
-    #We got utf8 from parser, the iPod likes utf16.., swapped..
-    $utf8string = Unicode::String::utf8($utf8string)->utf16;
-    $utf8string = Unicode::String::byteswap2($utf8string);
-    return $utf8string;
+    my $utf8 = shift;
+    my $utf16;
+    # We got utf8 from parser, the iPod likes utf16.., swapped..
+    if (UNIVERSAL::isa($utf8, 'Unicode::String')) {
+        $utf16 = $utf8->utf16;
+    }
+    else {
+        $utf16 = Unicode::String::utf8($utf8)->utf16;
+    }
+    $utf16 = Unicode::String::byteswap2($utf16);
+    return $utf16;
 }
 
 #returns a (dummy) timestamp in MAC time format

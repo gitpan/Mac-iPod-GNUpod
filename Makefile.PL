@@ -12,6 +12,9 @@ WriteMakefile(
         'MP3::Info' =>        1.02,
         'XML::Parser' =>      2.33,
         'File::Copy' =>       2.05,
+        'File::Spec' =>       0.85,
+        'File::Spec::Mac' =>  1.4,
+        'Audio::Wav' =>       0.04,
         'Unicode::String' =>  2.07
                         }
 );

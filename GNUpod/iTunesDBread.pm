@@ -11,7 +11,6 @@ package Mac::iPod::GNUpod::iTunesDBread;
 use strict;
 use warnings;
 no warnings 'uninitialized'; # Useful throughout script (we deal with lots of intended undefs)
-use Carp qw/carp croak/;
 use Unicode::String;
 use Mac::iPod::GNUpod::Utils;
 
@@ -247,7 +246,7 @@ sub get_pl {
         for(my $i=0;$i<$mhods;$i++) {
             my $mhh = get_mhod($pos);
             if($mhh->{size} == -1) {
-                croak "FATAL: Expected to find $mhods mhods, but I failed to get nr. $i. iTunesDBread.pm panic";
+                die "FATAL: Expected to find $mhods mhods, but I failed to get nr. $i. iTunesDBread.pm panic";
             }
             $pos+=$mhh->{size};
             if($mhh->{type} == 1) {
@@ -266,7 +265,7 @@ sub get_pl {
         for(my $i = 0; $i<$scount;$i++) {
             my $mhih = get_mhip($pos);
             if($mhih->{size} == -1) {
-                croak "FATAL: Expected to find $scount songs, but I failed to get nr. $i. iTunesDBread.pm panic";
+                die "FATAL: Expected to find $scount songs, but I failed to get nr. $i. iTunesDBread.pm panic";
             }
             $pos += $mhih->{size};
             push(@pldata, $mhih->{sid}) if $mhih->{sid};
@@ -315,7 +314,7 @@ sub get_mhits {
 
     ## Paranoia check
     if(abs($ret{volume}) > 100) {
-        carp "Volume is $ret{volume} percent for song $ret{id}.. set to 0 percent";
+        $@ .= "Volume is $ret{volume} percent for song $ret{id}.. set to 0 percent";
         $ret{volume} = 0;
     }
 
@@ -326,7 +325,7 @@ sub get_mhits {
     for(my $i=0; $i < $mhods; $i++) {
         my $mhh = get_mhod($sum);
         if($mhh->{size} == -1) {
-            croak "FATAL: Expected to find $mhods mhods, but I failed to get nr $i. iTunesDBread.pm panic";     
+            die "FATAL: Expected to find $mhods mhods, but I failed to get nr $i. iTunesDBread.pm panic";     
         }
         $sum+=$mhh->{size};
         my $xml_name = $mhod_array[$mhh->{type}];
