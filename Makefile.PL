@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use ExtUtils::MakeMaker qw/WriteMakefile/;
+
+WriteMakefile(
+    NAME =>             'Mac::iPod::GNUpod',
+    ABSTRACT_FROM =>    'GNUpod.pm',
+    VERSION_FROM =>     'GNUpod.pm',
+    PREREQ_PM =>        {
+        'MP3::Info' =>        1.02,
+        'XML::Parser' =>      2.33,
+        'File::Copy' =>       2.05,
+        'Unicode::String' =>  2.07
+                        }
+);
