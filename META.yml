@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Mac-iPod-GNUpod
+version:      1.21
+version_from: GNUpod.pm
+installdirs:  site
+requires:
+    Audio::Wav:                    0.04
+    File::Copy:                    2.05
+    File::Spec:                    0.85
+    File::Spec::Mac:               1.4
+    MP3::Info:                     1.02
+    Unicode::String:               2.07
+    XML::Parser:                   2.33
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -300,6 +300,10 @@ sub get_mhits {
     $ret{starttime}= get_int($sum+68,4);
     $ret{stoptime} = get_int($sum+72,4);
     $ret{playcount}= get_int($sum+80,4); #84 has also something to do with playcounts. (Like rating + prerating?)
+    $ret{lastplay} = get_int($sum+88,4);
+    $ret{addtime}  = get_int($sum+104,4);
+    $ret{bookmark} = get_int($sum+108,4);
+    $ret{bpm}      = get_int($sum+122,2);
 
     $ret{rating}   = int((get_int($sum+28,4)-256)/oct('0x14000000'));
     $ret{prerating}= int(get_int($sum+120,4) / oct('0x140000'));

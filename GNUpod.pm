@@ -60,7 +60,7 @@ use XML::Parser;
 use Carp qw/carp croak/;
 our @CARP_NOT = qw/XML::Parser XML::Parser::Expat Mac::iPod::GNUpod/;
 
-our $VERSION = '1.2';
+our $VERSION = '1.21';
 
 # Global variables
 
