@@ -60,7 +60,7 @@ use XML::Parser;
 use Carp qw/carp croak/;
 our @CARP_NOT = qw/XML::Parser XML::Parser::Expat Mac::iPod::GNUpod/;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 # Global variables
 
@@ -1234,9 +1234,10 @@ you should write this db at the end of any script.
 Add a song to the iPod. Takes one or more arguments, which are the filenames of
 songs to be added. Files are recognized by their extensions, so attempting to
 add a file with an unknown extension (or no extension) will fail. Currently
-only C<.mp3> and C<.wav> files are supported.  On success, this method returns
-the new id number of the song(s), on failure returns undef. Failure can mean
-that the file could not be copied or that duplicate files were found.
+C<.mp3>, C<.wav>, C<.mp4> and C<.m4a> files are supported.  On success, this
+method returns the new id number of the song(s), on failure returns undef.
+Failure can mean that the file could not be copied or that duplicate files were
+found.
 
 For MP3 files, metadata (artist, title, etc.) are gleaned from the ID3 tag,
 with preference given to ID3v2. For WAV files, data are taken from metadata
@@ -1476,7 +1477,8 @@ the module does is better :).
 
 =head1 TODO
 
-Add support for more filetypes, particularly .m4a/.mp4 files.
+Catch up with new development on GNUpod, ensure compatibility with all iPod
+formats.
 
 =head1 BUGS
 
@@ -1491,11 +1493,11 @@ safe.
 
 Original GNUpod scripts by Adrian Ulrich <F<pab at blinkenlights.ch>>.
 Adaptation for CPAN, much code rewriting, and expansion by JS Bangs
-<F<jaspax@cpan.org>>.
+<F<jaspax@cpan.org>>. Patch for MP4 files by Masanori Hara.
 
 =head1 VERSION
 
-v. 1.2, Jan 09 2004.
+v. 1.22, Apr 27 2006.
 
 =head1 LICENSE
 

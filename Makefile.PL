@@ -10,6 +10,7 @@ WriteMakefile(
     VERSION_FROM =>     'GNUpod.pm',
     PREREQ_PM =>        {
         'MP3::Info' =>        1.02,
+        'MP4::Info' =>        1.07,
         'XML::Parser' =>      2.33,
         'File::Copy' =>       2.05,
         'File::Spec' =>       0.85,

@@ -13,6 +13,7 @@ use Exporter;
 use Unicode::String;
 use File::Spec;
 use MP3::Info qw(:all); 
+use MP4::Info;
 use Audio::Wav;
 
 @ISA = qw/Exporter/;
@@ -24,6 +25,7 @@ use warnings;
 BEGIN {
     MP3::Info::use_winamp_genres();
     MP3::Info::use_mp3_utf8(0);
+    MP4::Info::use_mp4_utf8(0);
 }
 
 # Reformat shx numbers
@@ -99,7 +101,7 @@ sub matches {
     }
 }
 
-# Try to discover the file format (mp3 or QT (AAC) )
+# Try to discover the file format
 sub wtf_is {
     my $file = shift;
     my $h;
@@ -111,11 +113,9 @@ sub wtf_is {
     elsif ($file =~ m/\.wav$/) {
         $h = wav_info($file);
     }
-=rem Currently unimplemented
-    else if ($file =~ m/\.(mp4|m4a)$/) {
+    elsif ($file =~ m/\.(mp4|m4a)$/) {
         $h = mp4_info($file);
     }
-=cut
 
     # Unrecognized file types
     else {
@@ -216,8 +216,56 @@ sub mp3_info {
     return \%rh;
 }
 
-# This will be filled out someday
+# This subroutine written by Masanori Hara, added in v. 1.22
 sub mp4_info {
+    my $file = shift;
+
+    my $h = MP4::Info::get_mp4info($file);
+    return unless $h; #Not an mp3
+
+    #This is our default fallback:
+    #If we didn't find a title, we'll use the
+    #Filename.. why? because you are not able
+    #to play the file without a filename ;)
+    my $cf = (File::Spec->splitpath($file))[-1];
+
+    my %rh = ();
+
+    $rh{bitrate}  = $h->{BITRATE};
+    $rh{filesize} = $h->{SIZE};
+    $rh{srate}    = int($h->{FREQUENCY}*1000);
+    $rh{time}     = int($h->{SECS}*1000);
+    $rh{fdesc}    = $h->{TOO};
+
+    $h = MP4::Info::get_mp4tag($file,1);  #Get the IDv1 tag
+    my $hs = MP4::Info::get_mp4tag($file, 2, 2); #Get the IDv2 tag
+    # If any of these are array refs (multiple values), take last value
+    for (keys %$hs) {
+        if (ref($hs->{$_}) eq 'ARRAY') {
+            $hs->{$_} = $hs->{$_}->[-1];
+        }
+    }
+
+    #IDv2 is stronger than IDv1..
+    #Try to parse things like 01/01
+    no warnings 'uninitialized';
+    no warnings 'numeric';
+    my @songa = parseslashes($hs->{TRCK} || $h->{TRACKNUM});
+    my @cda   = parseslashes($hs->{TPOS});
+    $rh{songs}    = int($songa[1]);
+    $rh{songnum}  = int($songa[0]);
+    $rh{cdnum}    = int($cda[0]);
+    $rh{cds}      = int($cda[1]);
+    $rh{year}     = $hs->{TYER} || $h->{YEAR}   || 0;
+    $rh{title}    = $hs->{TIT2} || $h->{TITLE}  || $cf || "Untitled";
+    $rh{album}    = $hs->{TALB} || $h->{ALBUM}  || "Unknown Album";
+    $rh{artist}   = $hs->{TPE1} || $h->{ARTIST} || "Unknown Artist";
+    $rh{genre}    =                $h->{GENRE}  || "";
+    $rh{comment}  = $hs->{COMM} || $h->{COMMENT}|| "";
+    $rh{composer} = $hs->{TCOM} || "";
+    $rh{playcount}= int($hs->{PCNT}) || 0;
+
+    return \%rh;
 }
 
 # Guess format
