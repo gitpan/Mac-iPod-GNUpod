@@ -60,7 +60,7 @@ use XML::Parser;
 use Carp qw/carp croak/;
 our @CARP_NOT = qw/XML::Parser XML::Parser::Expat Mac::iPod::GNUpod/;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 # Global variables
 
@@ -74,7 +74,7 @@ sub new {
         allow_dup => 0,     # Whether duplicates are allowed
         move_files => 1,    # Whether to actually move files on add or rm
         files => [],        # List of file hrefs
-        idx => {},          # Indexes of song properties (for searching)
+        idx => {},          # Indices of song properties (for searching)
         plorder => [],      # List of playlists in order
         pl_idx => {},       # Playlists by name
         spl_idx => {}       # Smartplaylists by name
@@ -514,7 +514,7 @@ sub add_song {
 
         # Copy the file
         if (defined $self->{mnt} and $self->move_files) {
-            File::Copy::copy($song, $target) or do {
+            File::Copy::copy($filename, $target) or do {
                 warnings::warnif "Couldn't copy $song to $target: $!, skipping";
                 next;
             }
@@ -1253,7 +1253,36 @@ contain the file's metadata. Ex:
 
 You can also use this method to add custom fields to your database. Any keys
 you put in your hashref will be indexed for searching and written to the GNUpod
-database, but otherwise ignored.
+database, but otherwise ignored. The predefined keys that are safe to set using
+the hashref form of this method are:
+
+=over 4
+
+=item * artist
+
+=item * album
+
+=item * title
+
+=item * songnum
+
+=item * songs
+
+=item * cdnum
+
+=item * cds
+
+=item * composer
+
+=item * year
+
+=item * genre
+
+=back
+
+Custom keys may be anything, so long as they don't conflict with any of the
+predefined keys returned from L<"get_song">. Setting any other keys returned from
+C<get_song> results in undefined behavior.
 
 =head2 get_dup
 
@@ -1304,33 +1333,21 @@ the following keys, some of which may be undef:
 
 =item * genre
 
-=item * fdesc
-
-A brief description of the file type
+=item * fdesc: A brief description of the file type
 
 =item * filesize
 
 =item * bitrate
 
-=item * time
+=item * time: Playing time in milliseconds
 
-Playing time in milliseconds
-
-=item * srate
-
-The frequency in hertz
+=item * srate: The frequency in hertz
 
 =item * playcount
 
-=item * path
+=item * patht: The iPod-formatted path. To get a path in local filesystem format, use L<"get_path">.
 
-The iPod-formatted path. To get a path in local filesystem format, use
-L<"get_path">.
-
-=item * orig_path
-
-The path to the file on the local filesystem. This key may not be available or
-accurate, depending on when and how this file was added to the database.
+=item * orig_path: The path to the file on the local filesystem. This key may not be available or accurate, depending on when and how this file was added to the database.
 
 =back
 
@@ -1495,9 +1512,20 @@ Original GNUpod scripts by Adrian Ulrich <F<pab at blinkenlights.ch>>.
 Adaptation for CPAN, much code rewriting, and expansion by JS Bangs
 <F<jaspax@cpan.org>>. Patch for MP4 files by Masanori Hara.
 
+=head2 HELP WANTED
+
+For the past few years, the only development on this module has been from
+bugfixes sent by other people. This is because I no longer have an iPod (gave
+it to my brother) or the time to work on the module (graduated from college and
+got a real job). If you have both of these things, you might want to take over
+as primary maintainer for this module. There is a lot of work that could be
+done, catching up with recent development in the GNUpod project and exploiting
+features of the newer iPods. If you're interested, drop me a line at the email
+address given above.
+
 =head1 VERSION
 
-v. 1.22, Apr 27 2006.
+v. 1.23, Dec 7, 2006.
 
 =head1 LICENSE
 
