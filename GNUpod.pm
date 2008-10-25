@@ -60,7 +60,7 @@ use XML::Parser;
 use Carp qw/carp croak/;
 our @CARP_NOT = qw/XML::Parser XML::Parser::Expat Mac::iPod::GNUpod/;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # Global variables
 
@@ -502,7 +502,7 @@ sub add_song {
         }
 
         # Get the path, etc.
-        ($fh->{path}, my $target) = $self->_getpath($song);
+        ($fh->{path}, my $target) = $self->_getpath($filename);
 
         # Check for duplicates
         unless ($self->allow_dup) {
@@ -1525,7 +1525,7 @@ address given above.
 
 =head1 VERSION
 
-v. 1.23, Dec 7, 2006.
+v. 1.24, October 25, 2008.
 
 =head1 LICENSE
 

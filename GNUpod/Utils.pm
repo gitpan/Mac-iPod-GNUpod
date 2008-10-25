@@ -164,6 +164,15 @@ sub wav_info {
     return \%rh;
 }
 
+sub get_last_nested {
+    my $ref = shift;
+    if (ref($ref) eq 'ARRAY') {
+        return get_last_nested($ref->[-1]);
+    }
+    return $ref;
+}
+
+
 # Read mp3 tags, return undef if file is not an mp3
 sub mp3_info {
     my $file = shift;
@@ -187,11 +196,10 @@ sub mp3_info {
 
     $h = MP3::Info::get_mp3tag($file,1);  #Get the IDv1 tag
     my $hs = MP3::Info::get_mp3tag($file, 2, 2); #Get the IDv2 tag
+
     # If any of these are array refs (multiple values), take last value
     for (keys %$hs) {
-        if (ref($hs->{$_}) eq 'ARRAY') {
-            $hs->{$_} = $hs->{$_}->[-1];
-        }
+        $hs->{$_} = get_last_nested($hs->{$_});
     }
 
     #IDv2 is stronger than IDv1..

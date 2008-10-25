@@ -19,9 +19,12 @@ DEPENDENCIES
 The following perl modules are required:
 
 MP3::Info
+MP4::Info
 XML::Parser
 Unicode::String
 File::Copy
+File::Spec::Mac
+Audio::Wav
 
 No other external programs are needed.
 
@@ -42,7 +45,7 @@ the files where you'd like them.
 COPYRIGHT AND LICENSE
 
 The original GNUpod toolset is (c) 2002-2003 Adrian Ulrich and is distributed
-under the GNU General Public License. The adaptation for CPAN is (c) 2003-2004
+under the GNU General Public License. The adaptation for CPAN is (c) 2003-2008
 JS Bangs, and is distributed under the same terms as Perl itself. A copy of the
 GPL is included in the LICENSE file.
 
